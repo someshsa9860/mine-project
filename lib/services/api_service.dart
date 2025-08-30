@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:gmineapp/models/token_model.dart';
 import 'package:gmineapp/models/trip_model.dart';
 import 'package:gmineapp/services/hive_service.dart';
@@ -18,7 +19,33 @@ import '../widgets/widgets.dart';
 class ApiService {
   static ValueNotifier<String?> reportPath = ValueNotifier<String?>(null);
 
-  static Future<String?> downloadStaffReportPdf() async {
+  static Future<void> downloadStaffReportPdf() async {
+    Get.dialog(
+      AlertDialog(
+        title: Text('Alert'),
+        content: Text(
+          "Are you sure to download, your tokens and trips will be recorded?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(closeOverlays: true);
+              handleDownload();
+            },
+            child: Text("Yes"),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back(closeOverlays: true);
+            },
+            child: Text("No"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static handleDownload() async {
     Loader.instance.show();
 
     try {

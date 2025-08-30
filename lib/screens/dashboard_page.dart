@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:gmineapp/screens/settings_page.dart';
 import 'package:gmineapp/screens/token_list_screen.dart';
 import 'package:gmineapp/screens/trip_list_screen.dart';
-import 'package:gmineapp/services/api_service.dart';
-import 'package:open_file/open_file.dart';
 
 import '../services/session_service.dart';
 import '../utils/constants.dart';
@@ -78,7 +76,7 @@ class DashboardPage extends StatelessWidget {
               ),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: () async {
@@ -86,64 +84,8 @@ class DashboardPage extends StatelessWidget {
                   },
                   child: Text('View Report'),
                 ),
-                if (SessionService.instance.currentUser?.isStaff() == true)
-                  TextButton(
-                    onPressed: () async {
-                      ApiService.downloadStaffReportPdf();
-                    },
-                    child: Text('Download Report'),
-                  ),
               ],
             ),
-            if (SessionService.instance.currentUser?.isStaff() == true)
-              ValueListenableBuilder(
-                builder: (context, value, child) {
-                  return Visibility(
-                    visible: (ApiService.reportPath.value != null),
-                    child: ListTile(
-                      title: Text('Report Downloaded'),
-                      trailing: IconButton(
-                        onPressed: () {
-                          OpenFile.open(
-                            ApiService.reportPath.value,
-                            type: "application/pdf",
-                          );
-                        },
-                        icon: Icon(Icons.share),
-                      ),
-                      leading: IconButton(
-                        onPressed: () {
-                          Get.dialog(
-                            AlertDialog(
-                              title: Text('Alert'),
-                              content: Text(
-                                "Are you sure to remove, you can't download it?",
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    ApiService.reportPath.value = null;
-                                    Get.back(closeOverlays: true);
-                                  },
-                                  child: Text("Yes"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Get.back(closeOverlays: true);
-                                  },
-                                  child: Text("No"),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                        icon: Icon(Icons.close),
-                      ),
-                    ),
-                  );
-                },
-                valueListenable: ApiService.reportPath,
-              ),
           ],
         ),
       ),
