@@ -1,4 +1,4 @@
-const domain = 'mine.solvebyai.in';
+const domain = 'sams.solvebyai.in';
 const url = 'https://$domain/api';
 const domainUrl = 'https://$domain';
 

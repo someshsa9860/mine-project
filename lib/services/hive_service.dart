@@ -42,7 +42,7 @@ class HiveService {
       final encryptionKey = Uint8List.fromList(key);
 
       box = await Hive.openBox(
-        'gs_rkhvk',
+        'gs_rkhvk_sams',
         encryptionCipher: HiveAesCipher(encryptionKey),
       );
     } catch (e, s) {

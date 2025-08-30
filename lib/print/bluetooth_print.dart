@@ -155,8 +155,11 @@ class BluetoothPrint {
     }
 
     // Header
-    bytes += ticket.text("Sahadev Minerals", styles: centerAlign);
-    bytes += ticket.text("GSTIN: 08AJTPC9669H2ZF", styles: centerAlign);
+    bytes += ticket.text(
+      "SHRI AMARMUMAL & SONS PRIVATE LIMITED",
+      styles: centerAlign,
+    );
+    bytes += ticket.text("GSTIN: 08ABJCS1562N1ZT", styles: centerAlign);
 
     // Customer info
     printLine("Bill No: ", tokenModel?.tokenNumber);
