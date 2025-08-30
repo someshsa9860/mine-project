@@ -159,6 +159,7 @@ class BluetoothPrint {
     bytes += ticket.text("GSTIN: 08AJTPC9669H2ZF", styles: centerAlign);
 
     // Customer info
+    printLine("Bill No: ", tokenModel?.tokenNumber);
     printLine("Name", tokenModel?.customer_name);
     printLine("Vehicle No", tokenModel?.vehicleNumber);
 
@@ -173,7 +174,7 @@ class BluetoothPrint {
     bytes += ticket.row([
       PosColumn(text: 'Bajri', width: 3, styles: leftAlign),
       PosColumn(
-        text: gst.toStringAsFixed(2) + "MT",
+        text: "${gst.toStringAsFixed(2)}MT",
         width: 4,
         styles: leftAlign,
       ),
