@@ -164,7 +164,7 @@ class BluetoothPrint {
     printLine("Vehicle No", tokenModel?.vehicleNumber);
 
     // Calculation
-    final double qty = (tripModel?.rweight ?? 0) / 1000;
+    final double qty = (tripModel?.rweight ?? 0);
     final double amount = ratePerTon * qty;
     final double gst = amount * gstRate;
     final double sgst = gst / 2;
