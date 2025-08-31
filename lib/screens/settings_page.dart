@@ -4,8 +4,11 @@ import 'package:get/get.dart';
 import 'package:gmineapp/services/auth_manager.dart';
 import 'package:gmineapp/services/hive_service.dart';
 import 'package:gmineapp/utils/constants.dart';
+import 'package:open_file/open_file.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../services/api_service.dart';
+import '../services/session_service.dart';
 import '../widgets/widgets.dart';
 import 'bluetooth_connect_screen.dart';
 
@@ -13,12 +16,9 @@ var paperSizes = [
   {'key': PaperSize.mm58.value.toString(), 'value': '58 mm'},
   {'key': PaperSize.mm80.value.toString(), 'value': '80 mm'},
 ];
-List<String> bluetoothFonts = [
-  "Default",
-  "Medium",
-  "Large",
-  "Ex-Large",
-  "Largest",
+var printerTypes = [
+  {'key': "PDF", 'value': 'PDF Print'},
+  {'key': "Bluetooth", 'value': 'Bluetooth Print'},
 ];
 
 class AppSettingsScreen extends StatelessWidget {
@@ -63,6 +63,24 @@ class _AccountScreenState extends State<AccountScreen> {
 
         _buildSettingItem(
           icon: Icons.receipt_long,
+          label: "Print Method",
+          trailing: DropdownButton(
+            value: HiveService.instance.get(SettingKeys.printer.toString()),
+            onChanged: (v) async {
+              HiveService.instance.put(SettingKeys.printer.toString(), v);
+              setState(() {});
+            },
+            items: printerTypes.map((map) {
+              return DropdownMenuItem(
+                value: map['key'].toString(),
+                child: Text(map['value'].toString()),
+              );
+            }).toList(),
+          ),
+          onTap: null,
+        ),
+        _buildSettingItem(
+          icon: Icons.receipt_long,
           label: "Paper size",
           trailing: DropdownButton(
             value: HiveService.instance.get(SettingKeys.paper.toString()),
@@ -80,6 +98,64 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
           onTap: null,
         ),
+        Divider(),
+        if (SessionService.instance.currentUser?.isStaff() == true)
+          TextButton(
+            onPressed: () async {
+              ApiService.downloadStaffReportPdf();
+            },
+            child: Text('Download Report'),
+          ),
+
+        if (SessionService.instance.currentUser?.isStaff() == true)
+          ValueListenableBuilder(
+            builder: (context, value, child) {
+              return Visibility(
+                visible: (ApiService.reportPath.value != null),
+                child: ListTile(
+                  title: Text('Report Downloaded'),
+                  trailing: IconButton(
+                    onPressed: () {
+                      OpenFile.open(
+                        ApiService.reportPath.value,
+                        type: "application/pdf",
+                      );
+                    },
+                    icon: Icon(Icons.share),
+                  ),
+                  leading: IconButton(
+                    onPressed: () {
+                      Get.dialog(
+                        AlertDialog(
+                          title: Text('Alert'),
+                          content: Text(
+                            "Are you sure to remove, you can't download it?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                ApiService.reportPath.value = null;
+                                Get.back(closeOverlays: true);
+                              },
+                              child: Text("Yes"),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Get.back(closeOverlays: true);
+                              },
+                              child: Text("No"),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    icon: Icon(Icons.close),
+                  ),
+                ),
+              );
+            },
+            valueListenable: ApiService.reportPath,
+          ),
         Divider(),
         _buildSettingItem(
           icon: Icons.logout,

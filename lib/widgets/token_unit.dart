@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:gmineapp/print/bluetooth_print.dart';
+import 'package:gmineapp/print/print.dart';
 import 'package:gmineapp/services/api_service.dart';
 import 'package:gmineapp/utils/loader.dart';
 import 'package:gmineapp/widgets/widgets.dart';
@@ -69,7 +69,7 @@ class TokenListUnit extends StatelessWidget {
                 IconButton(
                   tooltip: 'Print',
                   onPressed: () {
-                    BluetoothPrint(
+                    MyPrintService(
                       tokenModel: token,
                       formatType: PrintFormatType.entry,
                     ).printJob();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gmineapp/print/bluetooth_print.dart';
+import 'package:gmineapp/print/print.dart';
 import 'package:gmineapp/utils/constants.dart';
 
 import '../services/api_service.dart';
@@ -73,7 +73,7 @@ class _EntryScreenState extends State<EntryScreen> {
     final res = await ApiService.createToken(tokenData);
 
     if (res != null) {
-      BluetoothPrint(
+      MyPrintService(
         tokenModel: res,
         formatType: PrintFormatType.entry,
       ).printJob();

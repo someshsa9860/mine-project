@@ -3,7 +3,7 @@ import 'package:gmineapp/models/settings_model.dart';
 import 'package:gmineapp/models/token_model.dart';
 import 'package:gmineapp/services/hive_service.dart';
 
-import '../print/bluetooth_print.dart';
+import '../print/print.dart';
 import '../services/api_service.dart'; // hypothetical API file
 import '../widgets/widgets.dart'; // assumes your TextInput is here
 
@@ -96,7 +96,7 @@ class _ExitScreenState extends State<ExitScreen> {
     var res = await ApiService.completeTrip(tripData);
 
     if (res != null) {
-      BluetoothPrint(
+      MyPrintService(
         tripModel: res,
         tokenModel: selectedToken,
         formatType: PrintFormatType.exit,

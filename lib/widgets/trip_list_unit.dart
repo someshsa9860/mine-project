@@ -3,7 +3,7 @@ import 'package:gmineapp/widgets/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../../models/trip_model.dart';
-import '../print/bluetooth_print.dart';
+import '../print/print.dart';
 
 class TripListUnit extends StatelessWidget {
   final TripModel trip;
@@ -30,7 +30,7 @@ class TripListUnit extends StatelessWidget {
         ),
         trailing: const Icon(Icons.print),
         onTap: () {
-          BluetoothPrint(
+          MyPrintService(
             tokenModel: trip.tokenModel,
             tripModel: trip,
             formatType: PrintFormatType.exit,

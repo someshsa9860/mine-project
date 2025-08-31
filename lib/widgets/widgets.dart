@@ -577,4 +577,4 @@ showSnackBar(message) {
   );
 }
 
-enum SettingKeys { bluetooth, paper, bluetoothFont }
+enum SettingKeys { bluetooth, paper, bluetoothFont, printer }

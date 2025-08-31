@@ -1,16 +1,17 @@
 import 'package:esc_pos_utils/esc_pos_utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:gmineapp/print/print.dart';
+import 'package:gmineapp/print/bluetooth_print.dart';
+import 'package:gmineapp/print/pdf_print.dart';
 import 'package:gmineapp/widgets/widgets.dart';
 import 'package:intl/intl.dart';
-import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 
 import '../models/token_model.dart';
 import '../models/trip_model.dart';
 import '../services/hive_service.dart';
-import 'bluetoothConnection.dart';
 
-class BluetoothPrint {
+enum PrintFormatType { entry, exit }
+
+class MyPrintService {
   final TokenModel? tokenModel;
   final TripModel? tripModel;
   final PrintFormatType formatType;
@@ -19,7 +20,7 @@ class BluetoothPrint {
   List<String> headers = [];
   List<String> footers = [];
 
-  BluetoothPrint({required this.formatType, this.tokenModel, this.tripModel});
+  MyPrintService({required this.formatType, this.tokenModel, this.tripModel});
 
   PosStyles posStyles = PosStyles(
     width: PosTextSize.size1,
@@ -219,6 +220,7 @@ class BluetoothPrint {
   Future<List<int>> printBluetooth() async {
     final paperSetting =
         HiveService.instance.get('paper_size')?.toString() ?? '80';
+
     final paper = paperSetting.contains('58') ? PaperSize.mm58 : PaperSize.mm80;
 
     var settings = HiveService.instance.settings;
@@ -262,34 +264,27 @@ class BluetoothPrint {
   }
 
   Future<void> printJob() async {
-    final blue = BluetoothConnection.instance;
+    final printMethod =
+        HiveService.instance.get(SettingKeys.printer.toString())?.toString() ??
+        'bluetooth';
 
-    if (!await blue.checkBluetooth()) {
-      showSnackBar("Bluetooth not enabled or not configured.");
-      return;
-    }
-
-    try {
-      var bytes = await printBluetooth();
-
-      if (formatType == PrintFormatType.entry) {
-        bytes += await printBluetooth();
-
-        if (tokenModel?.vehicleType != 'Truck') {
-          bytes += await printBluetooth();
-        }
-      }
-
-      bytes += ticket!.feed(1);
-      final connected = await blue.connect(blue.device!);
-      if (connected) {
-        final result = await PrintBluetoothThermal.writeBytes(bytes);
-        showSnackBar(result ? "Printed successfully." : "Failed to print.");
-      } else {
-        showSnackBar("Could not connect to printer.");
-      }
-    } catch (e) {
-      showSnackBar("Print error: $e");
+    print('printMethod:$printMethod');
+    if (printMethod == "PDF") {
+      PdfPrint(
+        formatType: formatType,
+        tokenModel: tokenModel,
+        tripModel: tripModel,
+      ).printJob();
+    } else {
+      BluetoothPrint(
+        formatType: formatType,
+        tokenModel: tokenModel,
+        tripModel: tripModel,
+      ).printJob();
     }
   }
+}
+
+DateTime parseDate(date) {
+  return DateTime.tryParse("$date") ?? DateTime.now();
 }
