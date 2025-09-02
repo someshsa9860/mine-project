@@ -174,7 +174,7 @@ class BluetoothPrint {
     bytes += ticket.row([
       PosColumn(text: 'Bajri', width: 3, styles: leftAlign),
       PosColumn(
-        text: "${gst.toStringAsFixed(2)}MT",
+        text: "${(gst / 10).toStringAsFixed(2)}MT",
         width: 4,
         styles: leftAlign,
       ),
