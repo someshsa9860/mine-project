@@ -187,7 +187,7 @@ class PdfPrint {
           pw.TableRow(
             children: [
               pw.Text("Bajri"),
-              pw.Text("${gst.toStringAsFixed(2)}MT"),
+              pw.Text("${(ratePerTon / 1000).toStringAsFixed(2)}MT"),
               pw.Text(amount.toStringAsFixed(2)),
             ],
           ),

@@ -175,6 +175,15 @@ class ApiService {
       print(body);
       if (res.statusCode == 200) {
         HiveService.instance.updateUser(body['user']);
+        var createdParties = (body['createdParties'] as List).map(
+          (e) => e['name'],
+        );
+        HiveService.instance.put(
+          'createdParties',
+          createdParties.isEmpty
+              ? ["Vinod", "Digvijay", "Dilip", "Sampat", "Nanduji"]
+              : createdParties,
+        );
         HiveService.instance.updateSettings(body['settings']);
 
         HiveService.instance.putDashboardData(body);
