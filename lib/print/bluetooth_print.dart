@@ -174,7 +174,7 @@ class BluetoothPrint {
     bytes += ticket.row([
       PosColumn(text: 'Bajri', width: 3, styles: leftAlign),
       PosColumn(
-        text: "${(gst / 10).toStringAsFixed(2)}MT",
+        text: "${(qty / 1000).toStringAsFixed(2)}MT",
         width: 4,
         styles: leftAlign,
       ),
@@ -293,5 +293,5 @@ class BluetoothPrint {
 }
 
 DateTime parseDate(date) {
-  return DateTime.tryParse("$date") ?? DateTime.now();
+  return (DateTime.tryParse("$date") ?? DateTime.now()).toLocal();
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -69,8 +70,35 @@ class BluetoothConnection {
   }
 
   Future<bool> connect(Map? bluetoothDevice) async {
-    print('connecting=$bluetoothDevice');
+    // return true;
     try {
+      print('connecting=$bluetoothDevice');
+
+      if (!Platform.isWindows) {
+        var device = BluetoothDevice.fromId(bluetoothDevice?['address']);
+        var subscription = device.connectionState.listen((
+          BluetoothConnectionState state,
+        ) async {
+          print('connectionState:${state}');
+          if (state == BluetoothConnectionState.disconnected) {
+            Get.context!.read<BluetoothStatusBloc>().add(
+              BluetoothStatusChanged(false),
+            );
+          }
+          if (state == BluetoothConnectionState.connected) {
+            Get.context!.read<BluetoothStatusBloc>().add(
+              BluetoothStatusChanged(true),
+            );
+          }
+        });
+
+        device.cancelWhenDisconnected(subscription, delayed: true, next: true);
+
+        if (!device.isConnected) {
+          await device.connect();
+        }
+      }
+
       if (!await checkBluetooth()) {
         showSnackBar("Please allow Bluetooth and Location permissions.");
         return false;
@@ -81,39 +109,24 @@ class BluetoothConnection {
         return false;
       }
 
-      var _connectedInt = await Future.any([
-        PrintBluetoothThermal.connectionStatus,
-        Future.delayed(Duration(seconds: 20), () {
-          // showSnackBarToast(message: "Please switch on printer");
-          return -1;
-        }), // Timeout after 5 sec
-      ]);
+      var connected = await PrintBluetoothThermal.connectionStatus;
 
-      print('connectionStatus=$_connectedInt');
-      if (_connectedInt == -1) {
-        return false;
+      if (!connected) {
+        connected = await PrintBluetoothThermal.connect(
+          macPrinterAddress: "${bluetoothDevice['address']}".trim(),
+        );
       }
-      var _connected = _connectedInt == true;
-      print('_connected=$_connected');
-
-      if (!_connected) {
-        _connected = await Future.any([
-          PrintBluetoothThermal.connect(
-            macPrinterAddress: bluetoothDevice['address'],
-          ),
-          Future.delayed(Duration(seconds: 30), () {
-            // showSnackBarToast(message: "Please switch on printer");
-            return false;
-          }),
-          // Timeout after 5 sec
-        ]);
-        print('_connected.connect=$_connected');
+      if (!connected) {
+        connected = bluetoothDevice['connected'].toString() == 'true';
+      }
+      if (!connected) {
+        showSnackBar("Please switch on printer");
       }
       Get.context!.read<BluetoothStatusBloc>().add(
-        BluetoothStatusChanged(_connected),
+        BluetoothStatusChanged(connected),
       );
 
-      return _connected;
+      return connected;
     } catch (e) {
       print('Error in connect: $e');
       showSnackBar("Connection failed: ${e.toString()}");
