@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.gsrkhvk.gmineapp"
+    namespace = "com.gsrkhvk.gmineapp.pali"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
