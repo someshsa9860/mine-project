@@ -15,6 +15,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../utils/endpoints.dart';
 import '../utils/loader.dart';
 import '../widgets/widgets.dart';
+import 'auth_manager.dart';
 
 class ApiService {
   static ValueNotifier<String?> reportPath = ValueNotifier<String?>(null);
@@ -173,6 +174,7 @@ class ApiService {
       final res = await CallApi.instance.getData(EndPoints.initDataApi);
       var body = jsonDecode(res.body);
       print(body);
+      print(res.statusCode);
       if (res.statusCode == 200) {
         HiveService.instance.updateUser(body['user']);
         HiveService.instance.updateSettings(body['settings']);
@@ -180,6 +182,8 @@ class ApiService {
         HiveService.instance.putDashboardData(body);
 
         // showSnackBar("Data Refreshed");
+      } else if ([401, 403].contains(res.statusCode)) {
+        await AuthManager.instance.logout();
       } else {
         showSnackBar(body['message']);
       }
