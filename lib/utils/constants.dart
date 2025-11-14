@@ -1,4 +1,4 @@
-const version = '1.0.1@13Nov25';
+const version = '1.0.2@14Nov25';
 const versionCode = 4;
 const appName = "SSB-Pali";
 
