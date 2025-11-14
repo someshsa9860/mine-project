@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gmineapp/services/hive_service.dart';
 import 'package:gmineapp/utils/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -94,6 +95,17 @@ class BluetoothConnectScreenState extends State<BluetoothConnectScreen> {
                           Text('${address ?? ''}'),
                         ],
                       ).p8().p8(),
+
+                      SwitchListTile(
+                        title: Text('Print Without PIN checking'),
+                        value:
+                            HiveService.instance.get('directBluePrint') == true,
+                        onChanged: (v) async {
+                          await HiveService.instance.put('directBluePrint', v);
+                          setState(() {});
+                        },
+                      ),
+
                       Expanded(
                         child: Visibility(
                           visible: (!connected || address == null),

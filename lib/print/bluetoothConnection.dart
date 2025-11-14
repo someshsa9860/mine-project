@@ -71,6 +71,7 @@ class BluetoothConnection {
 
   Future<bool> connect(Map? bluetoothDevice) async {
     // return true;
+    var directBluePrint = HiveService.instance.get('directBluePrint');
     try {
       print('connecting=$bluetoothDevice');
 
@@ -93,6 +94,7 @@ class BluetoothConnection {
         });
 
         device.cancelWhenDisconnected(subscription, delayed: true, next: true);
+        print('device.isConnected:${device.isConnected}');
 
         if (!device.isConnected) {
           await device.connect();
@@ -122,14 +124,18 @@ class BluetoothConnection {
       if (!connected) {
         showSnackBar("Please switch on printer");
       }
+
       Get.context!.read<BluetoothStatusBloc>().add(
-        BluetoothStatusChanged(connected),
+        BluetoothStatusChanged(connected || directBluePrint),
       );
 
       return connected;
     } catch (e) {
       print('Error in connect: $e');
       showSnackBar("Connection failed: ${e.toString()}");
+      Get.context!.read<BluetoothStatusBloc>().add(
+        BluetoothStatusChanged(directBluePrint),
+      );
       return false;
     }
   }
@@ -139,6 +145,7 @@ class BluetoothConnection {
       var connected = Get.context!.read<BluetoothStatusBloc>().state.connected;
       if (connected) {
         print("Disconnecting from Bluetooth device...");
+
         await PrintBluetoothThermal.disconnect;
         connected = false;
       }
