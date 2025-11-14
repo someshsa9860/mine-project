@@ -72,11 +72,11 @@ class BluetoothConnection {
   Future<bool> connect(Map? bluetoothDevice) async {
     // return true;
     var directBluePrint = HiveService.instance.get('directBluePrint');
+    var device = BluetoothDevice.fromId(bluetoothDevice?['address']);
     try {
       print('connecting=$bluetoothDevice');
 
       if (!Platform.isWindows) {
-        var device = BluetoothDevice.fromId(bluetoothDevice?['address']);
         var subscription = device.connectionState.listen((
           BluetoothConnectionState state,
         ) async {
@@ -97,7 +97,11 @@ class BluetoothConnection {
         print('device.isConnected:${device.isConnected}');
 
         if (!device.isConnected) {
-          await device.connect();
+          try {
+            await device.connect();
+          } catch (e, s) {
+            showSnackBar('Connection Issue: $e');
+          }
         }
       }
 
@@ -131,6 +135,12 @@ class BluetoothConnection {
 
       return connected;
     } catch (e) {
+      if (directBluePrint && bluetoothDevice != null) {
+        PrintBluetoothThermal.connect(
+          macPrinterAddress: "${bluetoothDevice['address']}".trim(),
+        );
+      }
+
       print('Error in connect: $e');
       showSnackBar("Connection failed: ${e.toString()}");
       Get.context!.read<BluetoothStatusBloc>().add(

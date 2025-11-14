@@ -44,7 +44,7 @@ class BluetoothProvider extends ChangeNotifier {
               'address': result.device.remoteId.str,
               'rssi': result.rssi,
               'type': 0,
-              'connected': true,
+              'connected': result.device.isConnected,
             };
             if (devices.where((e) => e['address'] == item['address']).isEmpty) {
               devices.add(item);
@@ -71,7 +71,7 @@ class BluetoothProvider extends ChangeNotifier {
       'address': bluetoothDevice == null ? null : bluetoothDevice!['address'],
       'type': bluetoothDevice == null ? null : bluetoothDevice!['type'],
       'rssi': bluetoothDevice == null ? null : bluetoothDevice!['rssi'],
-      'connected': false,
+      'connected': true,
     };
 
     final preferences = HiveService.instance;
