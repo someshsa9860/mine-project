@@ -50,10 +50,11 @@ dependencies:
   get: ^4.7.2
   share_plus:
   pdf:
+  flutter_bluetooth_printer: ^2.20.0
   dropdown_button2: ^2.3.9
   board_datetime_picker: ^2.8.0
   velocity_x: ^4.3.1
-  esc_pos_utils: ^1.1.0
+  esc_pos_utils_plus:
   flutter_blue_plus: ^1.35.5
   flutter_esc_pos_network: ^1.0.2
   print_bluetooth_thermal: ^1.1.6
@@ -61,7 +62,7 @@ dependencies:
   location: ^8.0.1
   provider: ^6.1.5
   flutter_riverpod: ^2.6.1
-  flutter_launcher_icons: ^0.11.0
+  flutter_launcher_icons:
   dio: ^5.8.0+1
   open_file: ^3.5.10
 

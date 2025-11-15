@@ -2,8 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:gmineapp/services/hive_service.dart';
-import 'package:gmineapp/utils/loader.dart';
 import 'package:provider/provider.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -51,172 +49,154 @@ class BluetoothConnectScreenState extends State<BluetoothConnectScreen> {
         title: Text("Bluetooth Printer Setting"),
       ),
       body: SafeArea(
-        child: SizedBox(
-          width: size.width,
-          height: size.height,
-          child: BlocBuilder<BluetoothStatusBloc, BluetoothStatusState>(
-            builder: (context, state) {
-              var connected = state.connected;
-              return Consumer<BluetoothProvider>(
-                builder: (context, data, _) {
-                  var devices = data.devices.where(
-                    (element) =>
-                        (element['address'] != null) &&
-                        (element['name'] != null),
-                  );
+        child: BlocBuilder<BluetoothStatusBloc, BluetoothStatusState>(
+          builder: (context, state) {
+            var connected = state.connected;
+            return Consumer<BluetoothProvider>(
+              builder: (context, data, _) {
+                var devices = data.devices.where(
+                  (element) =>
+                      (element['address'] != null) && (element['name'] != null),
+                );
 
-                  devices = devices
-                      .map((e) {
-                        var distance = calculateDistance(e['rssi']);
-                        var distanceText = distance == -1
-                            ? '-'
-                            : '${distance.toStringAsFixed(2)} m';
+                devices = devices
+                    .map((e) {
+                      var distance = calculateDistance(e['rssi']);
+                      var distanceText = distance == -1
+                          ? '-'
+                          : '${distance.toStringAsFixed(2)} m';
 
-                        e['distance'] = distance;
-                        e['distanceText'] = distanceText;
-                        return e;
-                      })
-                      .toList()
-                      .sortedBy(
-                        (a, b) => ((a['distance']) as double).compareTo(
-                          b['distance'],
+                      e['distance'] = distance;
+                      e['distanceText'] = distanceText;
+                      return e;
+                    })
+                    .toList()
+                    .sortedBy(
+                      (a, b) =>
+                          ((a['distance']) as double).compareTo(b['distance']),
+                    );
+
+                String? address = data.bluetoothDevice?['address'];
+                return Column(
+                  children: [
+                    if (state.connecting) LinearProgressIndicator(),
+                    Column(
+                      children: [
+                        Text(
+                          '${"Status"}: ${connected ? "connected" : "disconnect"}',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                      );
+                        Text('${address ?? ''}'),
+                      ],
+                    ).p8().p8(),
 
-                  String? address = data.bluetoothDevice?['address'];
-                  return Column(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            '${"Status"}: ${connected ? "connected" : "disconnect"}',
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text('${address ?? ''}'),
-                        ],
-                      ).p8().p8(),
-
-                      SwitchListTile(
-                        title: Text('Print Without PIN checking'),
-                        value:
-                            HiveService.instance.get('directBluePrint') == true,
-                        onChanged: (v) async {
-                          await HiveService.instance.put('directBluePrint', v);
-                          setState(() {});
-                        },
-                      ),
-
-                      Expanded(
-                        child: Visibility(
-                          visible: (!connected || address == null),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: devices.isEmpty
-                                ? Center(
-                                    child: Text("Bluetooth Device Not Found"),
-                                  )
-                                : ListView(
-                                    children: devices.map((e) {
-                                      return ListTile(
-                                        onTap: () {
-                                          data.save(e, context);
-                                        },
-                                        title: Text(e['name'] ?? 'Unnamed'),
-                                        subtitle: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(e['address'] ?? 'Unnamed'),
-                                            Text('${e['distanceText']}'),
-                                          ],
-                                        ),
-                                        trailing:
-                                            data.bluetoothDevice != null &&
-                                                (address == e['address'])
-                                            ? const Icon(Icons.check_box)
-                                            : const Icon(
-                                                Icons
-                                                    .check_box_outline_blank_outlined,
-                                              ),
-                                      );
-                                    }).toList(),
-                                  ),
-                          ),
+                    Expanded(
+                      child: Visibility(
+                        visible: (!connected || address == null),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: devices.isEmpty
+                              ? Center(
+                                  child: Text("Bluetooth Device Not Found"),
+                                )
+                              : ListView(
+                                  children: devices.map((e) {
+                                    return ListTile(
+                                      onTap: () {
+                                        data.save(e, context);
+                                      },
+                                      title: Text(e['name'] ?? 'Unnamed'),
+                                      subtitle: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(e['address'] ?? 'Unnamed'),
+                                          Text('${e['distanceText']}'),
+                                        ],
+                                      ),
+                                      trailing:
+                                          data.bluetoothDevice != null &&
+                                              (address == e['address'])
+                                          ? const Icon(Icons.check_box)
+                                          : const Icon(
+                                              Icons
+                                                  .check_box_outline_blank_outlined,
+                                            ),
+                                    );
+                                  }).toList(),
+                                ),
                         ),
                       ),
-                      if (!connected || address == null)
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              data.scan();
-                            },
-                            child: Text("Scan"),
-                          ),
-                        ),
-                      if (!connected && address != null)
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton(
-                            onPressed: () async {
-                              Loader.instance.show();
-
-                              await BluetoothConnection.instance.connect(
-                                data.bluetoothDevice,
-                              );
-                              Loader.instance.hide();
-
-                              setState(() {});
-                            },
-                            child: Text("Connect Printer"),
-                          ),
-                        ),
-                      if (connected)
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  BluetoothConnection.instance
-                                      .disconnect()
-                                      .then((value) {
-                                        setState(() {});
-                                      });
-                                },
-                                child: Text("Disconnect"),
-                              ),
-                            ),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed: () async {
-                                  printTest();
-                                  // Future.delayed(Duration(seconds: 1))
-                                  //     .then((v) {
-                                  //   printTest();
-                                  // });
-                                },
-                                child: Text("Test Print"),
-                              ),
-                            ),
-                          ],
-                        ).py4(),
+                    ),
+                    if (!connected || address == null)
                       SizedBox(
                         width: double.infinity,
-                        child: FilledButton(
+                        child: OutlinedButton(
                           onPressed: () async {
-                            await addPrinterManually(context);
+                            data.scan();
                           },
-                          child: Text("Add Manually"),
+                          child: Text("Scan"),
                         ),
                       ),
-                    ],
-                  ).px8();
-                },
-              );
-            },
-          ),
+                    if (!connected && address != null)
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: () async {
+                            await BluetoothConnection.instance.connect(
+                              data.bluetoothDevice,
+                            );
+
+                            setState(() {});
+                          },
+                          child: Text("Connect Printer"),
+                        ),
+                      ),
+                    if (connected)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                BluetoothConnection.instance.disconnect().then((
+                                  value,
+                                ) {
+                                  setState(() {});
+                                });
+                              },
+                              child: Text("Disconnect"),
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () async {
+                                printTest();
+                                // Future.delayed(Duration(seconds: 1))
+                                //     .then((v) {
+                                //   printTest();
+                                // });
+                              },
+                              child: Text("Test Print"),
+                            ),
+                          ),
+                        ],
+                      ).py4(),
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: () async {
+                          await addPrinterManually(context);
+                        },
+                        child: Text("Add Manually"),
+                      ),
+                    ),
+                  ],
+                ).px8();
+              },
+            );
+          },
         ),
       ),
     );

@@ -1,16 +1,15 @@
 part of 'bluetooth_status_bloc.dart';
 
-@immutable
-sealed class BluetoothStatusState {
+class BluetoothStatusState {
   final bool connected;
-  const BluetoothStatusState({this.connected = false});
-}
+  final bool connecting;
 
-final class BluetoothStatusInitial extends BluetoothStatusState {
-  const BluetoothStatusInitial({bool connected = false})
-      : super(connected: connected);
+  const BluetoothStatusState({this.connected = false, this.connecting = false});
 
-  BluetoothStatusInitial copyWith({required bool connected}) {
-    return BluetoothStatusInitial(connected: connected);
+  BluetoothStatusState clone({bool? connected, bool? connecting}) {
+    return BluetoothStatusState(
+      connected: connected ?? this.connected,
+      connecting: connecting ?? this.connecting,
+    );
   }
 }

@@ -5,6 +5,8 @@ PODS:
   - flutter_blue_plus_darwin (0.0.2):
     - Flutter
     - FlutterMacOS
+  - flutter_bluetooth_printer (2.0.0):
+    - Flutter
   - location (0.0.1):
     - Flutter
   - open_file_ios (0.0.1):
@@ -16,16 +18,20 @@ PODS:
     - Flutter
   - print_bluetooth_thermal (0.0.1):
     - Flutter
+  - share_plus (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
   - flutter_blue_plus_darwin (from `.symlinks/plugins/flutter_blue_plus_darwin/darwin`)
+  - flutter_bluetooth_printer (from `.symlinks/plugins/flutter_bluetooth_printer/ios`)
   - location (from `.symlinks/plugins/location/ios`)
   - open_file_ios (from `.symlinks/plugins/open_file_ios/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - print_bluetooth_thermal (from `.symlinks/plugins/print_bluetooth_thermal/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
 
 EXTERNAL SOURCES:
   device_info_plus:
@@ -34,6 +40,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   flutter_blue_plus_darwin:
     :path: ".symlinks/plugins/flutter_blue_plus_darwin/darwin"
+  flutter_bluetooth_printer:
+    :path: ".symlinks/plugins/flutter_bluetooth_printer/ios"
   location:
     :path: ".symlinks/plugins/location/ios"
   open_file_ios:
@@ -44,16 +52,20 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   print_bluetooth_thermal:
     :path: ".symlinks/plugins/print_bluetooth_thermal/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
 
 SPEC CHECKSUMS:
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_blue_plus_darwin: 904ed52825285a15f60e9d90312337a09f11a785
+  flutter_bluetooth_printer: 03d6206c1cb42dc233d3d30b0071fac068c184fd
   location: d5cf8598915965547c3f36761ae9cc4f4e87d22e
   open_file_ios: 461db5853723763573e140de3193656f91990d9e
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   permission_handler_apple: 9878588469a2b0d0fc1e048d9f43605f92e6cec2
   print_bluetooth_thermal: 54a9ba9436479dd633d18f393669ee793ee498fa
+  share_plus: 8b6f8b3447e494cca5317c8c3073de39b3600d1f
 
 PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5
 

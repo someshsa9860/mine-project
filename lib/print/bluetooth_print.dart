@@ -1,5 +1,6 @@
-import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_esc_pos_network/flutter_esc_pos_network.dart';
 import 'package:gmineapp/widgets/widgets.dart';
 import 'package:intl/intl.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
@@ -263,7 +264,7 @@ class BluetoothPrint {
     final blue = BluetoothConnection.instance;
     final printMethod =
         HiveService.instance.get(SettingKeys.printer.toString())?.toString() ??
-        'bluetooth';
+        'Bluetooth';
 
     try {
       var bytes = await printBluetooth();
@@ -278,20 +279,38 @@ class BluetoothPrint {
 
       bytes += ticket!.feed(1);
 
-      if (printMethod == 'bluetooth') {
+      if (printMethod == 'Bluetooth') {
         if (!await blue.checkBluetooth()) {
           showSnackBar("Bluetooth not enabled or not configured.");
           return;
         }
-
-        final connected = await blue.connect(blue.device!);
-        if (connected) {
-          final result = await PrintBluetoothThermal.writeBytes(bytes);
-          showSnackBar(result ? "Printed successfully." : "Failed to print.");
-        } else {
-          showSnackBar("Could not connect to printer.");
+        {
+          final connected = await blue.connect(blue.device!);
+          if (connected) {
+            final result = await PrintBluetoothThermal.writeBytes(bytes);
+            showSnackBar(result ? "Printed successfully." : "Failed to print.");
+          } else {
+            showSnackBar("Could not connect to printer.");
+          }
         }
-      } else {}
+      } else {
+        print('wifi print');
+        var ipAddress = HiveService.instance.get('WIFI_ADDRESS');
+        if (ipAddress == null) {
+          showSnackBar('Please enter valid ip address for wifi printer');
+          return;
+        }
+        final printer = PrinterNetworkManager(ipAddress);
+        PosPrintResult connect = await printer.connect();
+        if (connect == PosPrintResult.success) {
+          PosPrintResult printing = await printer.printTicket(bytes);
+
+          print(printing.msg);
+          printer.disconnect();
+        } else {
+          showSnackBar('Wifi Connection error');
+        }
+      }
     } catch (e) {
       showSnackBar("Print error: $e");
     }
