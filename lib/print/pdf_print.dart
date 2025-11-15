@@ -167,10 +167,10 @@ class PdfPrint {
         child: pw.Column(
           children: [
             pw.Text(
-              "SHRI AMARMUMAL & SONS PRIVATE LIMITED",
+              "Sahadev Minerals",
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
             ),
-            pw.Text("GSTIN: 08ABJCS1562N1ZT"),
+            pw.Text("GSTIN: 08AJTPC9669H2ZF"),
           ],
         ),
       ),

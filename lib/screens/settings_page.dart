@@ -16,12 +16,9 @@ var paperSizes = [
   {'key': PaperSize.mm58.value.toString(), 'value': '58 mm'},
   {'key': PaperSize.mm80.value.toString(), 'value': '80 mm'},
 ];
-List<String> bluetoothFonts = [
-  "Default",
-  "Medium",
-  "Large",
-  "Ex-Large",
-  "Largest",
+var printerTypes = [
+  {'key': "PDF", 'value': 'PDF Print'},
+  {'key': "Bluetooth", 'value': 'Bluetooth Print'},
 ];
 
 class AppSettingsScreen extends StatelessWidget {
@@ -66,6 +63,24 @@ class _AccountScreenState extends State<AccountScreen> {
 
         _buildSettingItem(
           icon: Icons.receipt_long,
+          label: "Print Method",
+          trailing: DropdownButton(
+            value: HiveService.instance.get(SettingKeys.printer.toString()),
+            onChanged: (v) async {
+              HiveService.instance.put(SettingKeys.printer.toString(), v);
+              setState(() {});
+            },
+            items: printerTypes.map((map) {
+              return DropdownMenuItem(
+                value: map['key'].toString(),
+                child: Text(map['value'].toString()),
+              );
+            }).toList(),
+          ),
+          onTap: null,
+        ),
+        _buildSettingItem(
+          icon: Icons.receipt_long,
           label: "Paper size",
           trailing: DropdownButton(
             value: HiveService.instance.get(SettingKeys.paper.toString()),
@@ -91,6 +106,7 @@ class _AccountScreenState extends State<AccountScreen> {
             },
             child: Text('Download Report'),
           ),
+
         if (SessionService.instance.currentUser?.isStaff() == true)
           ValueListenableBuilder(
             builder: (context, value, child) {

@@ -261,11 +261,9 @@ class BluetoothPrint {
 
   Future<void> printJob() async {
     final blue = BluetoothConnection.instance;
-
-    if (!await blue.checkBluetooth()) {
-      showSnackBar("Bluetooth not enabled or not configured.");
-      return;
-    }
+    final printMethod =
+        HiveService.instance.get(SettingKeys.printer.toString())?.toString() ??
+        'bluetooth';
 
     try {
       var bytes = await printBluetooth();
@@ -279,13 +277,21 @@ class BluetoothPrint {
       }
 
       bytes += ticket!.feed(1);
-      final connected = await blue.connect(blue.device!);
-      if (connected) {
-        final result = await PrintBluetoothThermal.writeBytes(bytes);
-        showSnackBar(result ? "Printed successfully." : "Failed to print.");
-      } else {
-        showSnackBar("Could not connect to printer.");
-      }
+
+      if (printMethod == 'bluetooth') {
+        if (!await blue.checkBluetooth()) {
+          showSnackBar("Bluetooth not enabled or not configured.");
+          return;
+        }
+
+        final connected = await blue.connect(blue.device!);
+        if (connected) {
+          final result = await PrintBluetoothThermal.writeBytes(bytes);
+          showSnackBar(result ? "Printed successfully." : "Failed to print.");
+        } else {
+          showSnackBar("Could not connect to printer.");
+        }
+      } else {}
     } catch (e) {
       showSnackBar("Print error: $e");
     }
