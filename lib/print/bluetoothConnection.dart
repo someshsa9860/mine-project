@@ -150,6 +150,59 @@ class BluetoothConnection {
     }
   }
 
+  Future<bool> connect1(Map? bluetoothDevice) async {
+    print('connecting=$bluetoothDevice');
+    try {
+      if (!await checkBluetooth()) {
+        showSnackBar("Please allow Bluetooth and Location permissions.");
+        return false;
+      }
+
+      if (bluetoothDevice == null) {
+        showSnackBar("No Bluetooth device selected.");
+        return false;
+      }
+
+      var _connectedInt = await Future.any([
+        PrintBluetoothThermal.connectionStatus,
+        Future.delayed(Duration(seconds: 20), () {
+          // showSnackBarToast(message: "Please switch on printer");
+          return -1;
+        }), // Timeout after 5 sec
+      ]);
+
+      print('connectionStatus=$_connectedInt');
+      if (_connectedInt == -1) {
+        return false;
+      }
+      var _connected = _connectedInt == true;
+      print('_connected=$_connected');
+
+      if (!_connected) {
+        _connected = await Future.any([
+          PrintBluetoothThermal.connect(
+            macPrinterAddress: bluetoothDevice['address'],
+          ),
+          Future.delayed(Duration(seconds: 30), () {
+            // showSnackBarToast(message: "Please switch on printer");
+            return false;
+          }),
+          // Timeout after 5 sec
+        ]);
+        print('_connected.connect=$_connected');
+      }
+      Get.context!.read<BluetoothStatusBloc>().add(
+        BluetoothStatusChanged(_connected),
+      );
+
+      return _connected;
+    } catch (e) {
+      print('Error in connect: $e');
+      showSnackBar("Connection failed: ${e.toString()}");
+      return false;
+    }
+  }
+
   Future<bool> disconnect() async {
     try {
       var connected = Get.context!.read<BluetoothStatusBloc>().state.connected;
