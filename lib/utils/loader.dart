@@ -6,7 +6,6 @@ class Loader {
 
   static final Loader instance = Loader._internal();
 
-  BuildContext? _dialogContext;
   bool _isShowing = false;
 
   void show({String? message}) {
@@ -17,7 +16,6 @@ class Loader {
       context: Get.context!,
       barrierDismissible: false,
       builder: (ctx) {
-        _dialogContext = ctx;
         return Dialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
@@ -45,9 +43,9 @@ class Loader {
   }
 
   void hide() {
-    if (_isShowing && _dialogContext != null) {
-      Navigator.of(_dialogContext!).pop();
-      _dialogContext = null;
+    print('hide called:_isShowing:$_isShowing');
+    if (_isShowing) {
+      Navigator.of(Get.context!).pop();
       _isShowing = false;
     }
   }

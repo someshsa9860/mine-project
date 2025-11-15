@@ -1,4 +1,4 @@
-import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gmineapp/services/auth_manager.dart';
@@ -16,12 +16,10 @@ var paperSizes = [
   {'key': PaperSize.mm58.value.toString(), 'value': '58 mm'},
   {'key': PaperSize.mm80.value.toString(), 'value': '80 mm'},
 ];
-List<String> bluetoothFonts = [
-  "Default",
-  "Medium",
-  "Large",
-  "Ex-Large",
-  "Largest",
+var printerTypes = [
+  {'key': "PDF", 'value': 'PDF Print'},
+  {'key': "Bluetooth", 'value': 'Bluetooth Print'},
+  {'key': "WIFI", 'value': 'WIFI Print'},
 ];
 
 class AppSettingsScreen extends StatelessWidget {
@@ -66,6 +64,37 @@ class _AccountScreenState extends State<AccountScreen> {
 
         _buildSettingItem(
           icon: Icons.receipt_long,
+          label: "Print Method",
+          trailing: DropdownButton(
+            value: HiveService.instance.get(SettingKeys.printer.toString()),
+            onChanged: (v) async {
+              HiveService.instance.put(SettingKeys.printer.toString(), v);
+              setState(() {});
+            },
+            items: printerTypes.map((map) {
+              return DropdownMenuItem(
+                value: map['key'].toString(),
+                child: Text(map['value'].toString()),
+              );
+            }).toList(),
+          ),
+          onTap: null,
+        ),
+
+        if (HiveService.instance.get(SettingKeys.printer.toString()) == "WIFI")
+          ListTile(
+            onTap: () {
+              addPrinterManually(context);
+            },
+            title: Text('Wifi Address'),
+            subtitle: Text(
+              '${HiveService.instance.get('WIFI_ADDRESS') ?? 'Not set'}',
+            ),
+            trailing: Icon(Icons.edit),
+          ),
+
+        _buildSettingItem(
+          icon: Icons.receipt_long,
           label: "Paper size",
           trailing: DropdownButton(
             value: HiveService.instance.get(SettingKeys.paper.toString()),
@@ -91,6 +120,7 @@ class _AccountScreenState extends State<AccountScreen> {
             },
             child: Text('Download Report'),
           ),
+
         if (SessionService.instance.currentUser?.isStaff() == true)
           ValueListenableBuilder(
             builder: (context, value, child) {
@@ -164,6 +194,50 @@ class _AccountScreenState extends State<AccountScreen> {
           color: Colors.grey,
         ),
       ),
+    );
+  }
+
+  Future<void> addPrinterManually(BuildContext context) async {
+    final initData = {'address': HiveService.instance.get('WIFI_ADDRESS')};
+    final GlobalKey<FormState> _form = GlobalKey<FormState>();
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      // false = user must tap button, true = tap outside dialog
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text("Enter Printer IP Address (WIFI)"),
+          content: Form(
+            key: _form,
+            child: TextInput(
+              keyName: 'address',
+              initData: initData,
+              hint: "Enter Address",
+              context: dialogContext,
+              edit: true,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+              },
+            ),
+            TextButton(
+              child: Text("Save"),
+              onPressed: () {
+                _form.currentState?.save();
+                if (_form.currentState?.validate() == true) {
+                  HiveService.instance.put('WIFI_ADDRESS', initData['address']);
+                  Navigator.of(dialogContext).pop(); // Dismiss alert dialog
+                  setState(() {});
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

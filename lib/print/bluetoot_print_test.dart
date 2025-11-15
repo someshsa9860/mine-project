@@ -1,4 +1,5 @@
-import 'package:esc_pos_utils/esc_pos_utils.dart';
+import 'package:esc_pos_utils_plus/esc_pos_utils_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gmineapp/services/hive_service.dart';
 import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 
@@ -21,7 +22,9 @@ Future<List<int>> testBluetooth() async {
   bytes.addAll(await test(ticket));
 
   bytes += ticket.feed(1);
-  bytes += ticket.cut();
+  if (!kDebugMode) {
+    bytes += ticket.cut();
+  }
 
   return bytes;
 }
@@ -56,20 +59,27 @@ Future<void> printTest() async {
     if (!await blueConnector.checkBluetooth()) {
       return;
     }
-    // Attempt to connect and print based on the platform
-    final connectionResult = await blueConnector.connect(blueConnector.device!);
 
-    if (!connectionResult) {
-      throw Exception("Unable to connect to the printer.");
+    {
+      // Attempt to connect and print based on the platform
+      final connectionResult = await blueConnector.connect(
+        blueConnector.device!,
+      );
+      print('connectionResult:$connectionResult');
+
+      if (!connectionResult) {
+        throw Exception("Unable to connect to the printer.");
+      }
+
+      print('printResult:start');
+      final printResult = await PrintBluetoothThermal.writeBytes(bytes);
+      print('printResult:end');
+
+      final message = printResult
+          ? "Printing successful."
+          : "Unable to print. Check the printer connection.";
+      showSnackBar(message);
     }
-
-    final printResult = await PrintBluetoothThermal.writeBytes(bytes);
-
-    final message =
-        printResult
-            ? "Printing successful."
-            : "Unable to print. Check the printer connection.";
-    showSnackBar(message);
   } catch (e, stackTrace) {
     print("Error during Bluetooth printing: $e");
     print(stackTrace);

@@ -7,6 +7,7 @@ import 'package:gmineapp/widgets/widgets.dart';
 import 'package:intl/intl.dart';
 
 import '../../models/token_model.dart';
+import '../print/print.dart';
 
 class TokenListUnit extends StatelessWidget {
   final TokenModel token;
@@ -69,7 +70,7 @@ class TokenListUnit extends StatelessWidget {
                 IconButton(
                   tooltip: 'Print',
                   onPressed: () {
-                    BluetoothPrint(
+                    MyPrintService(
                       tokenModel: token,
                       formatType: PrintFormatType.entry,
                     ).printJob();

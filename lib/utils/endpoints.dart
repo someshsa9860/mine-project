@@ -1,4 +1,4 @@
-const domain = 'ssb.shrisahadevbajri.com';
+const domain = 'ssb-pali.shrisahadevbajri.com';
 const url = 'https://$domain/api';
 const domainUrl = 'https://$domain';
 

@@ -8,3 +8,9 @@ class BluetoothStatusChanged extends BluetoothStatusEvent {
 
   BluetoothStatusChanged(this.connected);
 }
+
+class BluetoothStatusConnecting extends BluetoothStatusEvent {
+  final bool connecting;
+
+  BluetoothStatusConnecting(this.connecting);
+}
