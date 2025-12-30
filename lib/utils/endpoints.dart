@@ -1,4 +1,6 @@
-const domain = 'ssb.shrisahadevbajri.com';
+import 'package:flutter/foundation.dart';
+
+const domain = kDebugMode ? 'mine.solvebyai.in' : 'ssb.shrisahadevbajri.com';
 const url = 'https://$domain/api';
 const domainUrl = 'https://$domain';
 

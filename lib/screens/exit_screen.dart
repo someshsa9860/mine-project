@@ -72,7 +72,10 @@ class _ExitScreenState extends State<ExitScreen> {
         (_parse('nweight') * _parse('nweight_rate'));
   }
 
-  double get finalBalance => totalAmount - (selectedToken?.advanceAmount ?? 0);
+  double get finalBalance =>
+      totalAmount -
+      (selectedToken?.advanceAmount ?? 0) -
+      _parse('discount_amt');
 
   void _submit() async {
     if (!_formKey.currentState!.validate() || selectedToken == null) return;
@@ -84,6 +87,7 @@ class _ExitScreenState extends State<ExitScreen> {
       'token_id': selectedToken!.id,
       'gross_weight': _parse('gross_weight'),
       'collected_amount': _parse('collected_amount'),
+      'discount_amt': _parse('discount_amt'),
       'nweight': _parse('nweight'),
       'rweight': _parse('rweight'),
       'payment_method': formData['payment_method'],
@@ -248,7 +252,12 @@ class _ExitScreenState extends State<ExitScreen> {
             ),
 
             const SizedBox(height: 16),
-            ...['gross_weight', 'rweight', 'collected_amount'].map(
+            ...[
+              'gross_weight',
+              'rweight',
+              'collected_amount',
+              'discount_amt',
+            ].map(
               (key) => TextInput(
                 keyName: key,
 
@@ -258,7 +267,7 @@ class _ExitScreenState extends State<ExitScreen> {
                     ? TextInputType.numberWithOptions(signed: true)
                     : TextInputType.number,
                 context: context,
-                requiredField: true,
+                requiredField: key != 'discount_amt',
                 edit: true,
                 onChanged: (_) => setState(() {}),
               ),
@@ -330,6 +339,16 @@ class _ExitScreenState extends State<ExitScreen> {
                       ),
                       Text(
                         '- $currency${selectedToken?.advanceAmount ?? 0}',
+                        style: const TextStyle(fontSize: 16, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Discount:', style: TextStyle(fontSize: 16)),
+                      Text(
+                        '- $currency${_parse('discount_amt')}',
                         style: const TextStyle(fontSize: 16, color: Colors.red),
                       ),
                     ],
