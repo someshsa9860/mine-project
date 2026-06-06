@@ -51,7 +51,7 @@ class HiveService {
   }
 
   // Generic methods
-  void put<T>(String key, T value) => box.put(key, value);
+  put<T>(String key, T value) async => await box.put(key, value);
 
   T? get<T>(String key) => box.get(key);
 

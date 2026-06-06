@@ -6,9 +6,12 @@ part 'bluetooth_status_state.dart';
 
 class BluetoothStatusBloc
     extends Bloc<BluetoothStatusEvent, BluetoothStatusState> {
-  BluetoothStatusBloc() : super(const BluetoothStatusInitial()) {
+  BluetoothStatusBloc() : super(const BluetoothStatusState()) {
     on<BluetoothStatusChanged>((event, emit) {
-      emit(BluetoothStatusInitial(connected: event.connected));
+      emit(state.clone(connected: event.connected));
+    });
+    on<BluetoothStatusConnecting>((event, emit) {
+      emit(state.clone(connecting: event.connecting));
     });
   }
 }
