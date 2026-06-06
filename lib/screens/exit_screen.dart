@@ -73,6 +73,17 @@ class _ExitScreenState extends State<ExitScreen> {
 
   double get finalBalance => totalAmount - (selectedToken?.advanceAmount ?? 0);
 
+  double get cashAmount => _parse('cash_amount');
+  double get phonepayAmount => _parse('phonepay_amount');
+  double get collectedAmount => cashAmount + phonepayAmount;
+
+  String get _paymentMethod {
+    if (cashAmount > 0 && phonepayAmount > 0) return 'Cash+PhonePay';
+    if (phonepayAmount > 0) return 'PhonePay';
+    if (cashAmount > 0) return 'Cash';
+    return 'Cash';
+  }
+
   void _submit() async {
     if (!_formKey.currentState!.validate() || selectedToken == null) return;
     _formKey.currentState!.save();
@@ -82,10 +93,12 @@ class _ExitScreenState extends State<ExitScreen> {
     final tripData = {
       'token_id': selectedToken!.id,
       'gross_weight': _parse('gross_weight'),
-      'collected_amount': _parse('collected_amount'),
+      'cash_amount': cashAmount,
+      'phonepay_amount': phonepayAmount,
+      'collected_amount': collectedAmount,
       'nweight': _parse('nweight'),
       'rweight': _parse('rweight'),
-      'payment_method': formData['payment_method'],
+      'payment_method': _paymentMethod,
       'nweight_rate': _parse('nweight_rate'),
       'rweight_rate': _parse('rweight_rate'),
       'total_amount': totalAmount,
@@ -247,30 +260,32 @@ class _ExitScreenState extends State<ExitScreen> {
             ),
 
             const SizedBox(height: 16),
-            ...['gross_weight', 'rweight', 'collected_amount'].map(
+            ...['gross_weight', 'rweight'].map(
               (key) => TextInput(
                 keyName: key,
 
                 hint: key.replaceAll('_', ' ').toUpperCase(),
                 initData: formData,
-                inputType: key == 'collected_amount'
-                    ? TextInputType.numberWithOptions(signed: true)
-                    : TextInputType.number,
+                inputType: TextInputType.number,
                 context: context,
                 requiredField: true,
                 edit: true,
                 onChanged: (_) => setState(() {}),
               ),
             ),
-            RadioInput(
-              list: ['Cash', 'PhonePay'],
-              initData: formData,
-              keyName: 'payment_method',
+            // Split collected amount across Cash + PhonePay.
+            ...['cash_amount', 'phonepay_amount'].map(
+              (key) => TextInput(
+                keyName: key,
 
-              hint: "Mode",
-              onChanged: () {
-                setState(() {});
-              },
+                hint: key.replaceAll('_', ' ').toUpperCase(),
+                initData: formData,
+                inputType: TextInputType.numberWithOptions(signed: true),
+                context: context,
+                requiredField: false,
+                edit: true,
+                onChanged: (_) => setState(() {}),
+              ),
             ),
             const SizedBox(height: 8),
 
@@ -330,6 +345,46 @@ class _ExitScreenState extends State<ExitScreen> {
                       Text(
                         '- $currency${selectedToken?.advanceAmount ?? 0}',
                         style: const TextStyle(fontSize: 16, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Cash:', style: TextStyle(fontSize: 16)),
+                      Text(
+                        '$currency${cashAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('PhonePay:', style: TextStyle(fontSize: 16)),
+                      Text(
+                        '$currency${phonepayAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Collected:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '$currency${collectedAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),

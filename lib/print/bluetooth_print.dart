@@ -72,6 +72,33 @@ class BluetoothPrint {
       );
     }
 
+    // Owner / Registered No when present (Tractor-Local & Truck).
+    if ((tokenModel?.ownerName ?? '').isNotEmpty) {
+      bytes += ticket!.text("Owner: ${tokenModel?.ownerName}", styles: style);
+    }
+    if ((tokenModel?.registeredNo ?? '').isNotEmpty) {
+      bytes += ticket!.text(
+        "Registered No: ${tokenModel?.registeredNo}",
+        styles: style,
+      );
+    }
+
+    // Cash / PhonePay split for Tractor-Local.
+    if (tokenModel?.vehicleType == 'Tractor-Local') {
+      if ((tokenModel?.cashAmount ?? 0) > 0) {
+        bytes += ticket!.text(
+          "Cash: ${tokenModel?.cashAmount.toStringAsFixed(2)}",
+          styles: style,
+        );
+      }
+      if ((tokenModel?.phonepayAmount ?? 0) > 0) {
+        bytes += ticket!.text(
+          "PhonePay: ${tokenModel?.phonepayAmount.toStringAsFixed(2)}",
+          styles: style,
+        );
+      }
+    }
+
     bytes += ticket!.text(
       "Date: ${dateTimeFormat.format(parseDate(tokenModel?.tokenDate))}",
       styles: style,
@@ -122,6 +149,26 @@ class BluetoothPrint {
       "Exit Date: ${dateTimeFormat.format(parseDate(tripModel?.exitDate)) ?? '--'}",
       styles: style,
     );
+
+    // Cash / PhonePay split of the collected amount.
+    if ((tripModel?.cashAmount ?? 0) > 0) {
+      bytes += ticket!.text(
+        "Cash: ${tripModel?.cashAmount.toStringAsFixed(2)}",
+        styles: style,
+      );
+    }
+    if ((tripModel?.phonepayAmount ?? 0) > 0) {
+      bytes += ticket!.text(
+        "PhonePay: ${tripModel?.phonepayAmount.toStringAsFixed(2)}",
+        styles: style,
+      );
+    }
+    if (((tripModel?.cashAmount ?? 0) + (tripModel?.phonepayAmount ?? 0)) > 0) {
+      bytes += ticket!.text(
+        "Collected: ${((tripModel?.cashAmount ?? 0) + (tripModel?.phonepayAmount ?? 0)).toStringAsFixed(2)}",
+        styles: style,
+      );
+    }
 
     if (tripModel?.remark.isNotEmpty == true) {
       bytes += ticket!.text("Remark: ${tripModel!.remark}", styles: style);

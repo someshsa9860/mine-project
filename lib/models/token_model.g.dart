@@ -27,13 +27,17 @@ class TokenModelAdapter extends TypeAdapter<TokenModel> {
       staffId: fields[7] as String,
       tokenDate: fields[8] as String,
       customer_name: fields[9] as String,
+      registeredNo: fields[10] as String?,
+      ownerName: fields[11] as String?,
+      cashAmount: fields[12] == null ? 0 : (fields[12] as num).toDouble(),
+      phonepayAmount: fields[13] == null ? 0 : (fields[13] as num).toDouble(),
     );
   }
 
   @override
   void write(BinaryWriter writer, TokenModel obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +57,15 @@ class TokenModelAdapter extends TypeAdapter<TokenModel> {
       ..writeByte(8)
       ..write(obj.tokenDate)
       ..writeByte(9)
-      ..write(obj.customer_name);
+      ..write(obj.customer_name)
+      ..writeByte(10)
+      ..write(obj.registeredNo)
+      ..writeByte(11)
+      ..write(obj.ownerName)
+      ..writeByte(12)
+      ..write(obj.cashAmount)
+      ..writeByte(13)
+      ..write(obj.phonepayAmount);
   }
 
   @override
