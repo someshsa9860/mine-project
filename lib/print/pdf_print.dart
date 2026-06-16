@@ -180,6 +180,11 @@ class PdfPrint {
     widgets.add(pw.Text("Bill No: ${tokenModel?.tokenNumber ?? '--'}"));
     widgets.add(pw.Text("Name: ${tokenModel?.customer_name ?? '--'}"));
     widgets.add(pw.Text("Vehicle No: ${tokenModel?.vehicleNumber ?? '--'}"));
+    widgets.add(
+      pw.Text(
+        "Date & Time: ${dateTimeFormat.format(parseDate(tripModel?.exitDate))}",
+      ),
+    );
 
     widgets.add(
       pw.Table(

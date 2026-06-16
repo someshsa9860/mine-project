@@ -60,7 +60,10 @@ class _EntryScreenState extends State<EntryScreen> {
         if ((vehicle.ownerName ?? '').isNotEmpty) {
           formData['owner_name'] = vehicle.ownerName;
         }
-        if ((vehicle.registeredNo ?? '').isNotEmpty) {
+        // For a Tractor the vehicle number IS the registered number, so a
+        // separate registered_no is redundant — only fill it for Trucks.
+        if (formData['vehicle_type'] == 'Truck' &&
+            (vehicle.registeredNo ?? '').isNotEmpty) {
           formData['registered_no'] = vehicle.registeredNo;
         }
         // Rebuild the form so auto-filled values render.
@@ -381,15 +384,6 @@ class _EntryScreenState extends State<EntryScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _vehicleNumberField(),
-                            TextInput(
-                              keyName: 'registered_no',
-                              hint: 'Registered No',
-                              initData: formData,
-                              context: context,
-                              capitalized: true,
-                              edit: true,
-                              requiredField: false,
-                            ),
                             TextInput(
                               keyName: 'owner_name',
                               hint: 'Owner Name',

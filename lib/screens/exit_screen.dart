@@ -71,7 +71,10 @@ class _ExitScreenState extends State<ExitScreen> {
         (_parse('nweight') * _parse('nweight_rate'));
   }
 
-  double get finalBalance => totalAmount - (selectedToken?.advanceAmount ?? 0);
+  double get finalBalance =>
+      totalAmount -
+      (selectedToken?.advanceAmount ?? 0) -
+      _parse('discount_amt');
 
   double get cashAmount => _parse('cash_amount');
   double get phonepayAmount => _parse('phonepay_amount');
@@ -96,6 +99,7 @@ class _ExitScreenState extends State<ExitScreen> {
       'cash_amount': cashAmount,
       'phonepay_amount': phonepayAmount,
       'collected_amount': collectedAmount,
+      'discount_amt': _parse('discount_amt'),
       'nweight': _parse('nweight'),
       'rweight': _parse('rweight'),
       'payment_method': _paymentMethod,
@@ -287,6 +291,16 @@ class _ExitScreenState extends State<ExitScreen> {
                 onChanged: (_) => setState(() {}),
               ),
             ),
+            TextInput(
+              keyName: 'discount_amt',
+              hint: 'DISCOUNT AMT',
+              initData: formData,
+              inputType: TextInputType.number,
+              context: context,
+              requiredField: false,
+              edit: true,
+              onChanged: (_) => setState(() {}),
+            ),
             const SizedBox(height: 8),
 
             Container(
@@ -344,6 +358,16 @@ class _ExitScreenState extends State<ExitScreen> {
                       ),
                       Text(
                         '- $currency${selectedToken?.advanceAmount ?? 0}',
+                        style: const TextStyle(fontSize: 16, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Discount:', style: TextStyle(fontSize: 16)),
+                      Text(
+                        '- $currency${_parse('discount_amt')}',
                         style: const TextStyle(fontSize: 16, color: Colors.red),
                       ),
                     ],

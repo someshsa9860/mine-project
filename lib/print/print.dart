@@ -36,5 +36,5 @@ class MyPrintService {
 }
 
 DateTime parseDate(date) {
-  return DateTime.tryParse("$date") ?? DateTime.now();
+  return DateTime.tryParse("$date")?.toLocal() ?? DateTime.now();
 }

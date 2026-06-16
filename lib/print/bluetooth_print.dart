@@ -151,26 +151,6 @@ class BluetoothPrint {
       styles: style,
     );
 
-    // Cash / PhonePay split of the collected amount.
-    if ((tripModel?.cashAmount ?? 0) > 0) {
-      bytes += ticket!.text(
-        "Cash: ${tripModel?.cashAmount.toStringAsFixed(2)}",
-        styles: style,
-      );
-    }
-    if ((tripModel?.phonepayAmount ?? 0) > 0) {
-      bytes += ticket!.text(
-        "PhonePay: ${tripModel?.phonepayAmount.toStringAsFixed(2)}",
-        styles: style,
-      );
-    }
-    if (((tripModel?.cashAmount ?? 0) + (tripModel?.phonepayAmount ?? 0)) > 0) {
-      bytes += ticket!.text(
-        "Collected: ${((tripModel?.cashAmount ?? 0) + (tripModel?.phonepayAmount ?? 0)).toStringAsFixed(2)}",
-        styles: style,
-      );
-    }
-
     if (tripModel?.remark.isNotEmpty == true) {
       bytes += ticket!.text("Remark: ${tripModel!.remark}", styles: style);
     }
@@ -210,6 +190,10 @@ class BluetoothPrint {
     printLine("Bill No: ", tokenModel?.tokenNumber);
     printLine("Name", tokenModel?.customer_name);
     printLine("Vehicle No", tokenModel?.vehicleNumber);
+    printLine(
+      "Date & Time",
+      dateTimeFormat.format(parseDate(tripModel?.exitDate)),
+    );
 
     // Calculation
     final double qty = (tripModel?.rweight ?? 0);
