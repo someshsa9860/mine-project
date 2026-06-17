@@ -73,6 +73,33 @@ class BluetoothPrint {
       );
     }
 
+    // Owner / Registered No when present (Tractor-Local & Truck).
+    if ((tokenModel?.ownerName ?? '').isNotEmpty) {
+      bytes += ticket!.text("Owner: ${tokenModel?.ownerName}", styles: style);
+    }
+    if ((tokenModel?.registeredNo ?? '').isNotEmpty) {
+      bytes += ticket!.text(
+        "Registered No: ${tokenModel?.registeredNo}",
+        styles: style,
+      );
+    }
+
+    // Cash / PhonePay split for Tractor-Local.
+    if (tokenModel?.vehicleType == 'Tractor-Local') {
+      if ((tokenModel?.cashAmount ?? 0) > 0) {
+        bytes += ticket!.text(
+          "Cash: ${tokenModel?.cashAmount.toStringAsFixed(2)}",
+          styles: style,
+        );
+      }
+      if ((tokenModel?.phonepayAmount ?? 0) > 0) {
+        bytes += ticket!.text(
+          "PhonePay: ${tokenModel?.phonepayAmount.toStringAsFixed(2)}",
+          styles: style,
+        );
+      }
+    }
+
     bytes += ticket!.text(
       "Date: ${dateTimeFormat.format(parseDate(tokenModel?.tokenDate))}",
       styles: style,
@@ -163,6 +190,10 @@ class BluetoothPrint {
     printLine("Bill No: ", tokenModel?.tokenNumber);
     printLine("Name", tokenModel?.customer_name);
     printLine("Vehicle No", tokenModel?.vehicleNumber);
+    printLine(
+      "Date & Time",
+      dateTimeFormat.format(parseDate(tripModel?.exitDate)),
+    );
 
     // Calculation
     final double qty = (tripModel?.rweight ?? 0);

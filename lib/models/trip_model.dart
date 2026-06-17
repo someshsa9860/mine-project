@@ -57,6 +57,12 @@ class TripModel extends HiveObject {
   @HiveField(17)
   double? collected_amount;
 
+  @HiveField(18)
+  double cashAmount;
+
+  @HiveField(19)
+  double phonepayAmount;
+
   TripModel({
     required this.id,
     required this.tokenId,
@@ -76,6 +82,8 @@ class TripModel extends HiveObject {
     required this.exitDate,
     this.tokenModel,
     required this.staffId,
+    this.cashAmount = 0,
+    this.phonepayAmount = 0,
   });
 
   factory TripModel.fromJson(Map<String, dynamic> json) => TripModel(
@@ -92,6 +100,8 @@ class TripModel extends HiveObject {
     totalAmount: (json['total_amount'] ?? 0).toDouble(),
     finalBalance: (json['final_balance'] ?? 0).toDouble(),
     collected_amount: (json['collected_amount'] ?? 0).toDouble(),
+    cashAmount: (json['cash_amount'] ?? 0).toDouble(),
+    phonepayAmount: (json['phonepay_amount'] ?? 0).toDouble(),
     status: json['status'] ?? 'pending',
     remark: json['remark'] ?? '',
     exitDate: json['exit_date'] ?? '',
@@ -116,6 +126,8 @@ class TripModel extends HiveObject {
     'status': status,
     'remark': remark,
     'collected_amount': collected_amount,
+    'cash_amount': cashAmount,
+    'phonepay_amount': phonepayAmount,
     'exit_date': exitDate,
     'staff_id': staffId,
   };

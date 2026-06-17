@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gmineapp/models/settings_model.dart';
 import 'package:gmineapp/models/token_model.dart';
-import 'package:gmineapp/print/print.dart';
 import 'package:gmineapp/services/hive_service.dart';
 
 import '../print/bluetooth_print.dart';
@@ -77,6 +76,17 @@ class _ExitScreenState extends State<ExitScreen> {
       (selectedToken?.advanceAmount ?? 0) -
       _parse('discount_amt');
 
+  double get cashAmount => _parse('cash_amount');
+  double get phonepayAmount => _parse('phonepay_amount');
+  double get collectedAmount => cashAmount + phonepayAmount;
+
+  String get _paymentMethod {
+    if (cashAmount > 0 && phonepayAmount > 0) return 'Cash+PhonePay';
+    if (phonepayAmount > 0) return 'PhonePay';
+    if (cashAmount > 0) return 'Cash';
+    return 'Cash';
+  }
+
   void _submit() async {
     if (!_formKey.currentState!.validate() || selectedToken == null) return;
     _formKey.currentState!.save();
@@ -86,11 +96,13 @@ class _ExitScreenState extends State<ExitScreen> {
     final tripData = {
       'token_id': selectedToken!.id,
       'gross_weight': _parse('gross_weight'),
-      'collected_amount': _parse('collected_amount'),
+      'cash_amount': cashAmount,
+      'phonepay_amount': phonepayAmount,
+      'collected_amount': collectedAmount,
       'discount_amt': _parse('discount_amt'),
       'nweight': _parse('nweight'),
       'rweight': _parse('rweight'),
-      'payment_method': formData['payment_method'],
+      'payment_method': _paymentMethod,
       'nweight_rate': _parse('nweight_rate'),
       'rweight_rate': _parse('rweight_rate'),
       'total_amount': totalAmount,
@@ -101,7 +113,7 @@ class _ExitScreenState extends State<ExitScreen> {
     var res = await ApiService.completeTrip(tripData);
 
     if (res != null) {
-      MyPrintService(
+      BluetoothPrint(
         tripModel: res,
         tokenModel: selectedToken,
         formatType: PrintFormatType.exit,
@@ -252,35 +264,42 @@ class _ExitScreenState extends State<ExitScreen> {
             ),
 
             const SizedBox(height: 16),
-            ...[
-              'gross_weight',
-              'rweight',
-              'collected_amount',
-              'discount_amt',
-            ].map(
+            ...['gross_weight', 'rweight'].map(
               (key) => TextInput(
                 keyName: key,
 
                 hint: key.replaceAll('_', ' ').toUpperCase(),
                 initData: formData,
-                inputType: key == 'collected_amount'
-                    ? TextInputType.numberWithOptions(signed: true)
-                    : TextInputType.number,
+                inputType: TextInputType.number,
                 context: context,
-                requiredField: key != 'discount_amt',
+                requiredField: true,
                 edit: true,
                 onChanged: (_) => setState(() {}),
               ),
             ),
-            RadioInput(
-              list: ['Cash', 'PhonePay'],
-              initData: formData,
-              keyName: 'payment_method',
+            // Split collected amount across Cash + PhonePay.
+            ...['cash_amount', 'phonepay_amount'].map(
+              (key) => TextInput(
+                keyName: key,
 
-              hint: "Mode",
-              onChanged: () {
-                setState(() {});
-              },
+                hint: key.replaceAll('_', ' ').toUpperCase(),
+                initData: formData,
+                inputType: TextInputType.numberWithOptions(signed: true),
+                context: context,
+                requiredField: false,
+                edit: true,
+                onChanged: (_) => setState(() {}),
+              ),
+            ),
+            TextInput(
+              keyName: 'discount_amt',
+              hint: 'DISCOUNT AMT',
+              initData: formData,
+              inputType: TextInputType.number,
+              context: context,
+              requiredField: false,
+              edit: true,
+              onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 8),
 
@@ -350,6 +369,46 @@ class _ExitScreenState extends State<ExitScreen> {
                       Text(
                         '- $currency${_parse('discount_amt')}',
                         style: const TextStyle(fontSize: 16, color: Colors.red),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('Cash:', style: TextStyle(fontSize: 16)),
+                      Text(
+                        '$currency${cashAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text('PhonePay:', style: TextStyle(fontSize: 16)),
+                      Text(
+                        '$currency${phonepayAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Collected:',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '$currency${collectedAmount.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),

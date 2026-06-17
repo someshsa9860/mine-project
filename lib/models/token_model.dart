@@ -33,6 +33,18 @@ class TokenModel extends HiveObject {
   @HiveField(9)
   String customer_name;
 
+  @HiveField(10)
+  String? registeredNo;
+
+  @HiveField(11)
+  String? ownerName;
+
+  @HiveField(12)
+  double cashAmount;
+
+  @HiveField(13)
+  double phonepayAmount;
+
   TokenModel({
     required this.id,
     required this.tokenNumber,
@@ -44,6 +56,10 @@ class TokenModel extends HiveObject {
     required this.staffId,
     required this.tokenDate,
     required this.customer_name,
+    this.registeredNo,
+    this.ownerName,
+    this.cashAmount = 0,
+    this.phonepayAmount = 0,
   });
 
   factory TokenModel.fromJson(Map<String, dynamic> json) => TokenModel(
@@ -57,6 +73,10 @@ class TokenModel extends HiveObject {
     staffId: json['staff_id']?.toString() ?? '',
     tokenDate: json['token_date'] ?? '',
     customer_name: json['customer_name'] ?? '',
+    registeredNo: json['registered_no'],
+    ownerName: json['owner_name'],
+    cashAmount: (json['cash_amount'] ?? 0).toDouble(),
+    phonepayAmount: (json['phonepay_amount'] ?? 0).toDouble(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -70,5 +90,9 @@ class TokenModel extends HiveObject {
     'staff_id': staffId,
     'token_date': tokenDate,
     'customer_name': customer_name,
+    'registered_no': registeredNo,
+    'owner_name': ownerName,
+    'cash_amount': cashAmount,
+    'phonepay_amount': phonepayAmount,
   };
 }

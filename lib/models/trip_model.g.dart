@@ -35,13 +35,15 @@ class TripModelAdapter extends TypeAdapter<TripModel> {
       exitDate: fields[13] as String,
       tokenModel: fields[16] as TokenModel?,
       staffId: fields[14] as String,
+      cashAmount: fields[18] == null ? 0 : (fields[18] as num).toDouble(),
+      phonepayAmount: fields[19] == null ? 0 : (fields[19] as num).toDouble(),
     );
   }
 
   @override
   void write(BinaryWriter writer, TripModel obj) {
     writer
-      ..writeByte(18)
+      ..writeByte(20)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -77,7 +79,11 @@ class TripModelAdapter extends TypeAdapter<TripModel> {
       ..writeByte(16)
       ..write(obj.tokenModel)
       ..writeByte(17)
-      ..write(obj.collected_amount);
+      ..write(obj.collected_amount)
+      ..writeByte(18)
+      ..write(obj.cashAmount)
+      ..writeByte(19)
+      ..write(obj.phonepayAmount);
   }
 
   @override

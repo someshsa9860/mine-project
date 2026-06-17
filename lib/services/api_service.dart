@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:gmineapp/models/token_model.dart';
 import 'package:gmineapp/models/trip_model.dart';
+import 'package:gmineapp/models/vehicle_model.dart';
 import 'package:gmineapp/services/hive_service.dart';
 import 'package:gmineapp/services/session_service.dart';
 import 'package:gmineapp/utils/api.dart';
@@ -237,6 +238,81 @@ class ApiService {
     final response = await CallApi.instance.getData(EndPoints.getTripsApi);
     final data = jsonDecode(response.body)['trips'];
     return (data as List).map((e) => TripModel.fromJson(e)).toList();
+  }
+
+  /// Look up a vehicle for auto-fill (owner/registered no) and blacklist check.
+  /// Returns null if not found. Stays silent (no loader/snackbar) since it is
+  /// triggered while the user is typing the vehicle number.
+  static Future<VehicleModel?> lookupVehicle(String vehicleNumber) async {
+    if (vehicleNumber.trim().isEmpty) return null;
+    try {
+      final res = await CallApi.instance.getData(
+        EndPoints.vehicleLookupApi,
+        body: {'vehicle_number': vehicleNumber.trim()},
+      );
+      if (res.statusCode == 200) {
+        final body = jsonDecode(res.body);
+        if (body['vehicle'] == null) return null;
+        return VehicleModel.fromJson(Map<String, dynamic>.from(body['vehicle']));
+      }
+    } catch (e, s) {
+      print(e);
+      print(s);
+    }
+    return null;
+  }
+
+  /// Blacklist a vehicle. Any staff may do this.
+  static Future<bool> blacklistVehicle(
+    String vehicleNumber,
+    String reason,
+  ) async {
+    Loader.instance.show();
+    try {
+      final res = await CallApi.instance.postData(
+        {'vehicle_number': vehicleNumber.trim(), 'reason': reason},
+        EndPoints.blacklistApi,
+      );
+      final body = jsonDecode(res.body);
+      if (res.statusCode == 200) {
+        showSnackBar(body['message'] ?? 'Vehicle blacklisted');
+        return true;
+      } else {
+        showSnackBar(body['message'] ?? 'Failed to blacklist');
+      }
+    } catch (e, s) {
+      showSnackBar("$e");
+      print(e);
+      print(s);
+    } finally {
+      Loader.instance.hide();
+    }
+    return false;
+  }
+
+  /// Remove a vehicle from the blacklist. Admin only (server enforces 403).
+  static Future<bool> unblacklistVehicle(String vehicleNumber) async {
+    Loader.instance.show();
+    try {
+      final res = await CallApi.instance.postData(
+        {'vehicle_number': vehicleNumber.trim()},
+        EndPoints.unblacklistApi,
+      );
+      final body = jsonDecode(res.body);
+      if (res.statusCode == 200) {
+        showSnackBar(body['message'] ?? 'Removed from blacklist');
+        return true;
+      } else {
+        showSnackBar(body['message'] ?? 'Only admin can remove from blacklist');
+      }
+    } catch (e, s) {
+      showSnackBar("$e");
+      print(e);
+      print(s);
+    } finally {
+      Loader.instance.hide();
+    }
+    return false;
   }
 
   static Future<void> deleteToken(TokenModel token) async {

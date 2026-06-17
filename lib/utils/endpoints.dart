@@ -13,4 +13,7 @@ class EndPoints {
   static const reportsPdfApi = '/generate-report-pdf';
   static const reportsViewApi = '/view-report-data';
   static const recentTokenApi = '/recent/tokens';
+  static const vehicleLookupApi = '/vehicle/lookup';
+  static const blacklistApi = '/vehicle/blacklist';
+  static const unblacklistApi = '/vehicle/unblacklist';
 }

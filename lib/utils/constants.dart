@@ -1,5 +1,5 @@
-const version = '1.0.3@30Dec25';
-const versionCode = 4;
+const version = '2.0.4@16Jun26';
+const versionCode = 5;
 const appName = "SSB-Pali";
 
 const creditParties = ["Vinod", "Digvijay", "Dilip", "Sampat", "Nanduji"];
