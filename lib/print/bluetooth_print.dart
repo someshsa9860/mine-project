@@ -84,22 +84,6 @@ class BluetoothPrint {
       );
     }
 
-    // Cash / PhonePay split for Tractor-Local.
-    if (tokenModel?.vehicleType == 'Tractor-Local') {
-      if ((tokenModel?.cashAmount ?? 0) > 0) {
-        bytes += ticket!.text(
-          "Cash: ${tokenModel?.cashAmount.toStringAsFixed(2)}",
-          styles: style,
-        );
-      }
-      if ((tokenModel?.phonepayAmount ?? 0) > 0) {
-        bytes += ticket!.text(
-          "PhonePay: ${tokenModel?.phonepayAmount.toStringAsFixed(2)}",
-          styles: style,
-        );
-      }
-    }
-
     bytes += ticket!.text(
       "Date: ${dateTimeFormat.format(parseDate(tokenModel?.tokenDate))}",
       styles: style,
