@@ -7,6 +7,7 @@ import 'package:gmineapp/models/dashboard_model.dart';
 import 'package:gmineapp/models/settings_model.dart';
 import 'package:gmineapp/models/vehicle_type_model.dart';
 import 'package:gmineapp/utils/api.dart';
+import 'package:gmineapp/utils/constants.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import '../models/token_model.dart';
@@ -102,6 +103,28 @@ class HiveService {
 
   void putDashboardData(Map<String, dynamic> data) {
     put<DashboardModel>('dashboardUpdate', DashboardModel.fromJson(data));
+  }
+
+  /// Persist the credit-party names sent by the backend (`initData` -> `types`,
+  /// each row has a `name`). Stored as a plain `List<String>` for the dropdown.
+  void updateCreditParties(dynamic types) {
+    if (types is! List) return;
+    final names = types
+        .map((e) => (e is Map ? e['name'] : null)?.toString().trim() ?? '')
+        .where((s) => s.isNotEmpty)
+        .toList();
+    if (names.isNotEmpty) {
+      put<List<String>>('creditParties', names);
+    }
+  }
+
+  /// Credit parties from the backend if available, else the built-in fallback.
+  List<String> get creditPartyList {
+    final stored = get<List>('creditParties');
+    if (stored != null && stored.isNotEmpty) {
+      return stored.map((e) => e.toString()).toList();
+    }
+    return creditParties;
   }
 
   DashboardModel? getDashboardData() {
