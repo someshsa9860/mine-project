@@ -179,7 +179,7 @@ class ApiService {
       if (res.statusCode == 200) {
         HiveService.instance.updateUser(body['user']);
         HiveService.instance.updateSettings(body['settings']);
-        HiveService.instance.updateCreditParties(body['types']);
+        HiveService.instance.updateCreditParties(body['creditParties']);
 
         HiveService.instance.putDashboardData(body);
 
