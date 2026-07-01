@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:gmineapp/print/bluetooth_print.dart';
 import 'package:gmineapp/print/print.dart';
-import 'package:gmineapp/utils/constants.dart';
 
 import '../services/api_service.dart';
+import '../services/hive_service.dart';
 import '../widgets/widgets.dart';
 
 class EntryScreen extends StatefulWidget {
@@ -342,7 +342,7 @@ class _EntryScreenState extends State<EntryScreen> {
 
                       if (formData['payment_method'] == 'Credit')
                         DropDownInputWidget(
-                          list: creditParties
+                          list: HiveService.instance.creditPartyList
                               .map((e) => {'label': '$e', 'value': '$e'})
                               .toList(),
                           initData: formData,
