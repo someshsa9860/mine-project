@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 2.0.6+7
+version: 2.0.7+8
 # Logout button 20Aug2025
 # Staff report page added on 24 jul 2025
 # Owner Dashboard page added on 3 Aug 2025
@@ -29,6 +29,7 @@ version: 2.0.6+7
 #   hide Registered No in tractor entry. Pali identity (name/package/URL) preserved.
 # 2.0.5+6 on 16 Jun 2026: Pali release build of the merged core features.
 # 2.0.6+7 on 21 Jun 2026: removed Cash/PhonePay pay details from entry print receipt
+# 2.0.7+8 on 01 Jul 2026: dynamic credit parties from backend (with fallback)
 
 environment:
   sdk: ^3.8.1
